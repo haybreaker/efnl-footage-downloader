@@ -65,9 +65,14 @@ export async function POST(req: Request) {
       try {
         sendUpdate({ type: "info", progress: 1, message: "Fetching footage page..." });
 
-        const matchHtmlResponse = await fetch(url);
+        const headers = {
+          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+          "Accept-Language": "en-US,en;q=0.5"
+        };
+        const matchHtmlResponse = await fetch(url, { headers });
         if (!matchHtmlResponse.ok) {
-          throw new Error("Failed to fetch match page");
+          throw new Error(`Failed to fetch match page: ${matchHtmlResponse.status} ${matchHtmlResponse.statusText}`);
         }
         const matchHtml = await matchHtmlResponse.text();
 
@@ -103,7 +108,7 @@ export async function POST(req: Request) {
         for (let q = 0; q < links.length; q++) {
           const playRelLink = links[q];
           const playUrl = BASE + playRelLink;
-          const htmlResponse = await fetch(playUrl);
+          const htmlResponse = await fetch(playUrl, { headers });
           const html = await htmlResponse.text();
 
           const rel = html.match(/src="([^"]+\.m3u8[^"]*)"/)?.[1];
@@ -116,13 +121,13 @@ export async function POST(req: Request) {
             : BASE + rel;
 
           sendUpdate({ type: "info", progress: 10 + q, message: `Parsing Media Playlist Q${q + 1}...` });
-          const m3u8Res = await fetch(m3u8Url);
+          const m3u8Res = await fetch(m3u8Url, { headers });
           let m3u8Text = await m3u8Res.text();
 
           let mediaPlaylistUrl = m3u8Url;
           if (m3u8Text.includes("#EXT-X-STREAM-INF")) {
             mediaPlaylistUrl = getMediaPlaylistUrl(m3u8Text, m3u8Url);
-            const mediaRes = await fetch(mediaPlaylistUrl);
+            const mediaRes = await fetch(mediaPlaylistUrl, { headers });
             m3u8Text = await mediaRes.text();
           }
 
@@ -158,7 +163,7 @@ export async function POST(req: Request) {
             let retries = 3;
             while (retries > 0) {
               try {
-                const res = await fetch(segment.url);
+                const res = await fetch(segment.url, { headers });
                 if (!res.ok) throw new Error(`Status ${res.status}`);
                 const buffer = await res.arrayBuffer();
                 fs.writeFileSync(segment.dest, Buffer.from(buffer));
