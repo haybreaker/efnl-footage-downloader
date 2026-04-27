@@ -66,11 +66,19 @@ export async function POST(req: Request) {
         sendUpdate({ type: "info", progress: 1, message: "Fetching footage page..." });
 
         const headers = {
-          "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-          "Accept-Language": "en-AU,en-GB;q=0.9,en-US;q=0.8,en;q=0.7",
-          "X-Forwarded-For": "1.128.0.1",
-          "X-Real-IP": "1.128.0.1"
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+          "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+          "Accept-Language": "en-AU,en;q=0.9",
+          "Cache-Control": "max-age=0",
+          "Connection": "keep-alive",
+          "Sec-Ch-Ua": '"Chromium";v="124", "Google Chrome";v="124", "Not-A.Brand";v="99"',
+          "Sec-Ch-Ua-Mobile": "?0",
+          "Sec-Ch-Ua-Platform": '"Windows"',
+          "Sec-Fetch-Dest": "document",
+          "Sec-Fetch-Mode": "navigate",
+          "Sec-Fetch-Site": "none",
+          "Sec-Fetch-User": "?1",
+          "Upgrade-Insecure-Requests": "1"
         };
         const matchHtmlResponse = await fetch(url, { headers });
         if (!matchHtmlResponse.ok) {
